@@ -1,0 +1,48 @@
+1. Industry/Problem Overview
+Context: Precise temperature control is crucial in manufacturing industries such as furnace manufacturing, Pharmaceuticals, Semiconductor Manufacturing, where even minor temperature fluctuations can affect product quality.
+Problem: In the above mentioned industries, maintaining consistent temperature during production is essential. Overheating or underheating can lead to defects that compromise the structural integrity of the product. For eg in case of medicine company it can hamper the quality of medicine.
+Industry Need: To ensure high-quality production, manufacturers need systems that can monitor and control the temperature in real-time, automatically shut down the heating elements when necessary, and log temperature data for future analysis.
+
+
+
+Objective of our project:
+1)Enhanced Temperature Control: The developed system will provide precise control over the temperature of the heating element, ensuring that it remains within the desired range and high quality final products are manufactured.
+
+2)Real-Time Monitoring Capability: The project will deliver a functional system that displays temperature readings in real-time on a connected screen allowing factory operators to monitor the production process closely.
+
+3)Automated Safety Mechanism: The integration of a relay in the system will automate the process of turning off the heating element and prevent overheating and potential damage to both the equipment and the products.
+
+4)Comprehensive Data Logging: The system will generate CSV files that log temperature data throughout the production process. These files will serve as valuable records for post-production analysis, helping to verify that the product was produced at the correct temperature and aiding in the detection of any anomalies or errors.
+
+
+
+Methodology
+Temperature Sensing with LM35: We began by utilizing the LM35 temperature sensor to capture accurate temperature readings from the heating element, ensuring precision in thermal monitoring.
+
+Custom Arduino Design: The Arduino microcontroller was designed and programmed specifically for temperature sensing applications. Data from the LM35 sensor was captured and displayed in real-time using the Serial Monitor in Arduino IDE.
+
+Relay Integration for Safety: A relay was integrated into the system, which used the temperature data as input to act as a safety mechanism. It automatically disconnects the heating element in the event of overheating or fault conditions, ensuring protection.
+
+Real-Time Monitoring via Website: A web interface was developed to display the temperature readings in real time, providing an accessible platform for monitoring and controlling the process remotely.
+
+Data Logging and Analysis: In addition to real-time monitoring, we implemented a system to log all temperature readings in a CSV file with precise timestamps. This allows for comprehensive record-keeping and post-production analysis of the temperature data.
+
+
+block/circuit diagram
+
+
+Measurement samples:
+excel file snapshot, website
+
+
+lifecycle & scope of project:
+Current Progress:
+1)Identified & created a solution for real life problem of complexity in data logging and safety mechanism for machinery in manufacturing industries. 
+2)Listed the components required for project & designed the circuit
+3)Captured data from temperature sensor and created a website for real-time display of readings
+4)Integrated CSV logging with timestamps.
+
+Future work:
+1)Implement a safety mechanism to automatically cut off the system when the measured value(in this case temperature) exceeds a predefined threshold.
+2)In case of a fault, send an error message to the admin.
+3)Enable the system to assess product quality independently by analyzing measured data during production.(temperature in case of furnace industry, weight in case of battery manufacturing plant)

@@ -1,0 +1,84 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Communicating Between a Webpage and Arduino</title>
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.4/socket.io.js'></script>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f9;
+        margin: 0;
+        padding: 20px;
+      }
+      h1 {
+        text-align: center;
+        color: #333;
+      }
+      table {
+        width: 80%;
+        margin: 20px auto;
+        border-collapse: collapse;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      }
+      table thead {
+        background-color: #4CAF50;
+        color: white;
+      }
+      table th, table td {
+        padding: 12px;
+        text-align: center;
+        border-bottom: 1px solid #ddd;
+      }
+      table tbody tr:nth-child(even) {
+        background-color: #f2f2f2;
+      }
+      table tbody tr:hover {
+        background-color: #ddd;
+      }
+      #data-table {
+        border-radius: 8px;
+        overflow: hidden;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Communicating Between a Webpage and Arduino</h1>
+    <table id="data-table">
+      <thead>
+        <tr>
+          <th>Timestamp</th>
+          <th>Sensor Value</th>
+        </tr>
+      </thead>
+      <tbody>
+      </tbody>
+    </table>
+    <script>
+      var socket = io();
+      socket.on('data', function(data) {
+        // Get the current timestamp
+        var timestamp = new Date().toLocaleString();
+        
+        // Get the table body
+        var tableBody = document.getElementById('data-table').getElementsByTagName('tbody')[0];
+        
+        // Create a new row
+        var newRow = tableBody.insertRow(0); // Insert the new row at the top (index 0)
+
+        // Insert cells for timestamp and sensor data
+        var timestampCell = newRow.insertCell(0);
+        var sensorCell = newRow.insertCell(1);
+
+        // Add data to the cells
+        timestampCell.innerHTML = timestamp;
+        sensorCell.innerHTML = data;
+
+        // Check if there are more than 20 rows in the table
+        if (tableBody.rows.length > 15) {
+          // Remove the oldest row (last row)
+          tableBody.deleteRow(-1);
+        }
+      });
+    </script>
+  </body>
+</html>
