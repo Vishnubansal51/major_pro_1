@@ -43,6 +43,11 @@
   </head>
   <body>
     <h1>Communicating Between a Webpage and Arduino</h1>
+
+    <div id="error-message" style="display: none; color: red; text-align: center; font-weight: bold; margin: 20px;">
+      <!-- Error message will appear here -->
+    </div>
+
     <table id="data-table">
       <thead>
         <tr>
@@ -55,8 +60,14 @@
     </table>
     <script>
       var socket = io();
+      var errorOccurred = false; // Flag to prevent further updates after error
+
       socket.on('data', function(data) {
-        // Get the current timestamp
+
+        // If there's no error, continue updating the data table
+        
+      
+          // Get the current timestamp
         var timestamp = new Date().toLocaleString();
         
         // Get the table body
@@ -78,7 +89,31 @@
           // Remove the oldest row (last row)
           tableBody.deleteRow(-1);
         }
+      
       });
+      socket.on("errorDetected", function (error) {
+      // Show error message and clear the data table
+      // var errorMessage = `Error Detected! Time: ${error.time}, Value: ${error.value}, Allowed Range: ${error.threshold.lower}-${error.threshold.upper}`;
+
+      // document.getElementById("error-message").innerText = errorMessage;
+      // document.getElementById("error-message").style.display = "block";
+
+      // // Clear the data table
+      // var tableBody = document.getElementById("data-table").getElementsByTagName("tbody")[0];
+      // tableBody.innerHTML = "";
+
+
+      errorOccurred = true; // Set flag to stop updates
+    var tableBody = document.getElementById('data-table').getElementsByTagName('tbody')[0];
+    
+    var errorRow = tableBody.insertRow(0);
+    var errorMessageCell = errorRow.insertCell(0);
+    var errorDetailsCell = errorRow.insertCell(1);
+    
+    errorMessageCell.colSpan = 2;
+    errorMessageCell.innerHTML = `Error Detected at ${error.time} - Elapsed Time: ${error.elapsedTime}s`;
+    errorDetailsCell.innerHTML = `Value: ${error.value}, Threshold: ${error.threshold.lower} - ${error.threshold.upper}`;
+    });
     </script>
   </body>
 </html>

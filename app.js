@@ -4,21 +4,23 @@ var index = fs.readFileSync("index.html");
 
 
 // JUST COMMENTED TO TEST WITHOUT ARDUINO
-// var SerialPort = require("serialport");
-// const parsers = SerialPort.parsers;
-// const parser = new parsers.Readline({
-//   delimiter: "\r\n",
-// });
+var SerialPort = require("serialport");
+const parsers = SerialPort.parsers;
+const parser = new parsers.Readline({
+  delimiter: "\r\n",
+});
 
-// var port = new SerialPort("COM5", {
-//   baudRate: 9600,
-//   dataBits: 8,
-//   parity: "none",
-//   stopBits: 1,
-//   flowControl: false,
-// });
+// *********
+// remember change port acc to the temp sensor
+var port = new SerialPort("COM13", {
+  baudRate: 9600,
+  dataBits: 8,
+  parity: "none",
+  stopBits: 1,
+  flowControl: false,
+});
 
-// port.pipe(parser);
+port.pipe(parser);
 // TILL THIS 
 
 var latestData = ""; // Buffer to store the latest data
@@ -37,7 +39,8 @@ io.on("connection", function (socket) {
 
 
 // Define temperature thresholds for each segment (lower and upper bounds)
-// Adjust these based on requirements
+// Adjust these based on requirements 
+//to do based on real data , do changes
 const thresholds = [
   { lower: 20, upper: 26 }, // Segment 1 thresholds
   { lower: 24, upper: 35 }, // Segment 2 thresholds
@@ -46,6 +49,7 @@ const thresholds = [
   { lower: 50, upper: 70 }, // Segment 5 thresholds
 ];
 
+
 let elapsedTime = 0;       // Track the elapsed time in seconds
 let segmentIndex = 0;      // Track the current segment
 const segmentDuration = 120; // Each segment duration is 2 minutes (120 seconds)
@@ -53,10 +57,13 @@ const segmentDuration = 120; // Each segment duration is 2 minutes (120 seconds)
 // Listen to data from the serial port and store the latest value 
 
 // JUST COMMENTED TO TEST WITHOUT ARDUINO
-// parser.on("data", function (data) {
-//   console.log("Received data from port: " + data);
-//   latestData = data; // Update the buffer with the latest sensor data
-// });
+parser.on("data", function (data) {
+  console.log("Received data from port: " + data);
+  latestData = data; // Update the buffer with the latest sensor data
+});
+
+// TILL THIS  
+
 
 // Emit the latest data every 2 seconds
 // setInterval(function () {
@@ -65,15 +72,17 @@ const segmentDuration = 120; // Each segment duration is 2 minutes (120 seconds)
 //   }
 // }, 2000); // 2000ms interval (2 seconds)
 
-
+let errorOccurred = false; // Flag to stop processing after error
 setInterval(function () {
 
   // to check without arduino 
-  const simulatedData = (Math.random() * 30 + 20).toFixed(2); // Range: 20-80
-  console.log("Simulated data: " + simulatedData);
-  latestData = simulatedData; // Update latest data with simulated value
+  // const simulatedData = (Math.random() * 30 + 20).toFixed(2); // Range: 20-80
+  // console.log("Simulated data: " + simulatedData);
+  // latestData = simulatedData; // Update latest data with simulated value
 
   // till this
+
+  if (errorOccurred) return; // Stop if an error has been detected
 
   elapsedTime += 2; // Increment elapsed time by 2 seconds
 
@@ -82,8 +91,17 @@ setInterval(function () {
   // Real-time threshold check for the current segment
   const currentThreshold = thresholds[segmentIndex];
   if (sensorValue < currentThreshold.lower || sensorValue > currentThreshold.upper) {
-    console.log(`Real-time Error Detected! Value: ${sensorValue} (Out of range: ${currentThreshold.lower}-${currentThreshold.upper}) at ${new Date().toLocaleString()}`);
-    io.emit("error", { time: new Date().toLocaleString(), value: sensorValue });
+
+    // console.log(`Real-time Error Detected! Value: ${sensorValue} (Out of range: ${currentThreshold.lower}-${currentThreshold.upper}) at ${new Date().toLocaleString()}`);
+
+    // io.emit("error", { time: new Date().toLocaleString(), value: sensorValue });
+    const errorMessage = `Real-time Error Detected! Value: ${sensorValue} (Out of range: ${currentThreshold.lower}-${currentThreshold.upper}) at ${new Date().toLocaleString()}`;
+    console.log(errorMessage);
+
+    io.emit("errorDetected", { time: new Date().toLocaleString(), value: sensorValue, threshold: currentThreshold,  elapsedTime: elapsedTime  });
+    errorOccurred = true;
+
+    
   }
 
   // Segment check every 2 minutes
@@ -105,8 +123,7 @@ setInterval(function () {
   if (latestData) {
     io.emit("data", latestData);
   }
-}, 2000); // Interval set to 2 seconds 
-
+}, 2000); // 2000ms interval (2 seconds)
 
 app.listen(3000);
 
